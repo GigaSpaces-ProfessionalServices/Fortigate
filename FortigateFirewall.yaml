@@ -1,0 +1,129 @@
+tosca_definitions_version: cloudify_dsl_1_2
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
+  - http://www.getcloudify.org/spec/fabric-plugin/1.3.1/plugin.yaml
+  - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
+
+inputs:
+
+  agent_user:
+    default: admin
+
+  fortinet_image:
+   default:  CFY-Fortigate
+
+  flavor:
+    default: dc1.1x1.20  # flavor should not exced 1024 size of RAM
+
+  agent_password:
+    default: admin
+
+  public_network:
+    type: string
+    default: Public-Net
+
+  public_network_subnet:
+    type: string
+    default: Public-Net-subnet
+
+  public_network_cidr:
+    type: string
+    default: 172.10.0.0/28
+
+  application_network:
+    type: string
+    default: Application-Net
+
+  application_network_subnet:
+    type: string
+    default: Application-Net-subnet
+
+  application_network_cidr:
+    type: string
+    default: 172.20.0.0/28
+
+  external_network_name:
+    type: string
+    default: external
+
+  management_network_name:
+     type: string
+     default: cloudify-management-network
+
+node_types:
+
+  port_node_type:
+     derived_from: cloudify.nodes.SoftwareComponent
+
+node_templates:
+
+  fortinetServer:
+    type: cloudify.openstack.nodes.Server
+    properties:
+      install_agent: false
+      image:  { get_input: fortinet_image }
+      flavor: { get_input: flavor }
+
+    relationships:
+        - target: public_net
+          type: cloudify.relationships.connected_to
+        - target: application_net
+          type: cloudify.relationships.connected_to
+
+        - target: server_float_ip
+          type: cloudify.openstack.server_connected_to_floating_ip
+
+#  Provision Public network and subnet
+
+  public_net:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { get_input: public_network }
+      use_external_resource : false
+
+  public_net_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { get_input: public_network_subnet }
+      use_external_resource : false
+      subnet:
+        ip_version: 4
+        cidr: { get_input: public_network_cidr }
+    relationships:
+      - target: public_net
+        type: cloudify.relationships.contained_in
+
+#  Provision Application network and subnet
+
+  application_net:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      resource_id: { get_input: application_network }
+      use_external_resource : false
+
+  application_net_subnet:
+    type: cloudify.openstack.nodes.Subnet
+    properties:
+      resource_id: { get_input: application_network_subnet }
+      use_external_resource : false
+      subnet:
+        ip_version: 4
+        cidr: { get_input: application_network_cidr }
+    relationships:
+      - target: application_net
+        type: cloudify.relationships.contained_in
+
+  server_float_ip:
+    type: cloudify.openstack.nodes.FloatingIP
+    properties:
+      floatingip:
+        floating_network_name: { get_input: external_network_name }
+
+  management_network:
+    type: cloudify.openstack.nodes.Network
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: management_network_name }
+
+
