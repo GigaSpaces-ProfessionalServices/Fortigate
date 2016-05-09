@@ -1,0 +1,14 @@
+agent_user: admin
+agent_password: admin
+fortinet_image: CFY-Fortigate
+flavor: dc1.1x1.20  # flavor should not exced 1024 size of RAM
+
+public_network: Public-Net
+public_network_subnet: Public-Net-subnet
+public_network_cidr: 172.10.0.0/28
+
+application_network: Application-Net
+application_network_subnet: Application-Net-subnet
+application_network_cidr: 172.20.0.0/28
+external_network_name: external
+
