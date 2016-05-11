@@ -118,7 +118,7 @@ node_templates:
         connect_networks:
 
           - management: true
-            switch_distributed: { get_input: management_network_distributed }
+            switch_distributed: true
             name: { get_input: management_network_name }
 
           - external: true
@@ -129,24 +129,7 @@ node_templates:
             name: { get_input: application_network }
             switch_distributed: false
 
-#
-#          - external: true
-#            switch_distributed: { get_input: external_network_switch_distributed }
-#            use_dhcp: { get_input: external_network_use_dhcp }
-#            network: { get_input: external_network_cidr }
-#            gateway: { get_input: external_network_gateway }
-#            ip: { get_input: external_network_ip}
-#            name: { get_input: external_network_name }
-#
-#          - external: false
-#            switch_distributed: { get_input: external_network_switch_distributed }
-#            use_dhcp: { get_input: external_network_use_dhcp }
-#            network: { get_input: external_network_cidr }
-#            gateway: { get_input: external_network_gateway }
-#            ip: { get_input: external_network_ip}
-#            name: { get_input: external_network_name }
-
-      connection_config: { get_property: [connection_configuration, connection_config] }
+#      connection_config: { get_property: [connection_configuration, connection_config] }
 
 #  Provision Public network and subnet
 
