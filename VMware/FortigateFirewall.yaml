@@ -133,23 +133,23 @@ node_templates:
 
 #  Provision Public network and subnet
 
-  public_net:
-    type: cloudify.vsphere.nodes.Network
-    properties:
-      network:
-            name: public_network
-            vlan_id: 101
-            vswitch_name: vSwitch0
-            switch_distributed: false
-
-#  Provision Application network and subnet
-
-  application_net:
-    type: cloudify.vsphere.nodes.Network
-    properties:
-      network:
-            name: application_network
-            vlan_id: 102
-            vswitch_name: vSwitch0
-            switch_distributed: false
-
+#  public_net:
+#    type: cloudify.vsphere.nodes.Network
+#    properties:
+#      network:
+#            name: public_network
+#            vlan_id: 101
+#            vswitch_name: vSwitch0
+#            switch_distributed: false
+#
+##  Provision Application network and subnet
+#
+#  application_net:
+#    type: cloudify.vsphere.nodes.Network
+#    properties:
+#      network:
+#            name: application_network
+#            vlan_id: 102
+#            vswitch_name: vSwitch0
+#            switch_distributed: false
+#
