@@ -1,0 +1,9 @@
+node_types:
+
+  fortigate.policy.config:
+    derived_from: cloudify.nodes.ApplicationServer
+
+  fortigate.service.config:
+    derived_from: cloudify.nodes.ApplicationServer
+
+

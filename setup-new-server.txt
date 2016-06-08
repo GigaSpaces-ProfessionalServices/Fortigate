@@ -12,7 +12,7 @@ Note: the image must be connected to any 3 networks so 3 interfaces will be assi
 # config system interface
    edit port1
    set mode dhcp
-   set allowaccess ssh http https
+   set allowaccess ssh http https fgfm
    end
 
 # execute reboot
@@ -27,7 +27,13 @@ on cli execute this commands (just use cut/paste)
 config system global
     set fgd-alert-subscription advisory latest-threat
     set hostname "FortiGate-VM64-KVM"
+    set dh-params 1024                   << --- must important to allow ssh
+    set ssh-cbc-cipher disable
+    set ssh-hmac-md5 disable
+    set strong-crypto disable
+    set gui-theme red
 end
+
 config system accprofile
     edit "prof_admin"
         set mntgrp read-write
@@ -80,19 +86,28 @@ config system interface
 end
 
 
-config firewall policy
+* Create Firewall Service
+
+  config firewall service custom
+     edit firewallServer
+         set protocol "TCP/UDP"
+         set tcp‐portrange 50-1000
+  end
+
+
+* Create Firewall Policy
+
+  configure firewall policy
     edit 1
-        set name "policy1"
-        set srcintf "port2"
-        set dstintf "port3"
-        set srcaddr "all"
-        set dstaddr "all"
-        set action accept
-        set schedule "always"
-        set service "HTTP" "HTTPS" "PING"
-        set logtraffic all
-    next
-end
+        set name demoPolicy
+        set srcintf port2
+        set dstintf port3
+        set srcaddr all
+        set dstaddr all
+        set service "firewallServer"
+        set action  accept
+        set schedule always
+
 
 ---------
 when done, 

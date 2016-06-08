@@ -1,0 +1,24 @@
+fortigate_user: 'admin'
+fortigate_password: ''
+fortinet_image: '8b8fa98d-19dd-4393-b886-c430b17a7465'  #   default: 'Fortigate_Image'
+flavor: '8e6069a3-d8c6-4741-8e0d-6373b2ca38cc'          #   default: dc1.1x1.20
+wan_network: 'privateExternal' #Wan
+wan_subnet: 'private-subnet' #WanSubnet
+lan_network: 'Lan'
+lan_subnet: 'LanSubnet'
+management_network_name: 'cloudify-management-network'
+external_network_name: 'external'
+
+###
+policy_name: 'DemoPolicy'
+policy_action: 'accept'
+# Service already exist on Fortigate (http,https,dns)
+policy_service: 'Web Access'
+policy_srcinterface: 'port2'
+policy_dstinterface: 'port3'
+
+###
+service_name: 'TCPportsAllow'
+service_protocol: 'TCP/UDP/SCTP'
+sesrvice_portrange: '100-150'
+
