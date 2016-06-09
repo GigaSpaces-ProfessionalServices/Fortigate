@@ -115,7 +115,7 @@ node_templates:
           inputs:
             username: { get_input: fortigate_user }
             password: { get_input: fortigate_password }
-            policyId: '2'           ## << - this is uniqe id per each policy you creating
+            policyId: '2'                               ## << - this is uniqe id per each policy you creating
             policyName: { get_input: policy_name }
             srcintf: { get_input: policy_srcinterface }
             dstintf: { get_input: policy_dstinterface }
