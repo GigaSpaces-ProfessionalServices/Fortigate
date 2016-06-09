@@ -1,3 +1,4 @@
+from cloudify.decorators import operation
 from cloudify import ctx
 from cloudify.state import ctx_parameters as inputs
 import paramiko
@@ -10,7 +11,6 @@ def exec_command(ctx, command):
 
     fortigate_host_ip = ctx.instance.host_ip
     ctx.logger.info('HOST_IP: {0}'.format(ctx.instance.host_ip))
-
 
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -26,7 +26,8 @@ def exec_command(ctx, command):
 ## Loop over relationships with 'connected_to_port' and assign the fixed ip to the relevant port
 ## the order of the port a based on the relationships order
 
-def config_ports(**kwargs):
+@operation
+def config_ports(ctx, **kwargs):
 
     ctx.logger.info('Start port config task....')
     portId = 2  # port 1 reserved for admin
@@ -56,7 +57,8 @@ def config_ports(**kwargs):
             portId += 1
 
 
-def create_policy(**kwargs):
+@operation
+def create_policy(ctx, **kwargs):
 
     ctx.logger.info('Start FW policy configuration....')
 
@@ -85,7 +87,8 @@ def create_policy(**kwargs):
     exec_command(ctx, command)
 
 
-def create_service(**kwargs):
+@operation
+def create_service(ctx, **kwargs):
 
     ctx.logger.info('Start FW service creation....')
 
@@ -104,18 +107,3 @@ def create_service(**kwargs):
 
     exec_command(ctx, command)
 
-
-
-def _main():
-
-    invocation = inputs['invocation']
-    ctx.logger.info('invocation = {0}'.format(invocation))
-
-    function = invocation['function']
-    ctx.logger.info('function = {0}'.format(function))
-
-    globals()[function]()
-
-
-if __name__ == '__main__':
-    _main()

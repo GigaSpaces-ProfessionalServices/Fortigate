@@ -7,7 +7,6 @@ imports:
   - http://www.getcloudify.org/spec/openstack-plugin/1.3.1/plugin.yaml
   - http://www.getcloudify.org/spec/diamond-plugin/1.3.2/plugin.yaml
   - types/fortigate-types.yaml
-  - plugins/cloudify-fortigate-plugin/plugin.yaml
 
 inputs:
 
@@ -17,7 +16,7 @@ inputs:
   fortigate_password:
     default: ''
 
-  Fortigate_image:
+  fortinet_image:
     default: '8b8fa98d-19dd-4393-b886-c430b17a7465'
 #   default: 'Fortigate_Image'
 
@@ -87,12 +86,12 @@ inputs:
 
 node_templates:
 
-  FortigateHost:
+  FortinetHost:
     type: cloudify.openstack.nodes.Server
     properties:
       install_agent: false
       server:
-         image: { get_input: Fortigate_image }
+         image: { get_input: fortinet_image }
          flavor: { get_input: flavor }
          name: Fortigate-Server
 
@@ -111,7 +110,7 @@ node_templates:
     interfaces:
       cloudify.interfaces.lifecycle:
         start:
-          implementation: fortigate.plugin.tasks.create_policy
+          implementation: scripts/fortigate.py
           inputs:
             username: { get_input: fortigate_user }
             password: { get_input: fortigate_password }
@@ -122,12 +121,30 @@ node_templates:
             action:  { get_input: policy_action }
             serviceName: { get_input: service_name }
 
+            invocation:
+                function: create_policy
+
+          executor: central_deployment_agent
 
     relationships:
       - target: service.config
         type: cloudify.relationships.depends_on
-      - target: FortigateHost
+      - target: FortinetHost
         type: cloudify.relationships.contained_in
+
+#          implementation: fabric.fabric_plugin.tasks.run_task
+#          inputs:
+#            tasks_file: scripts/fortigate.py
+#            task_name: create_policy
+#            task_properties:
+#                username: { get_input: fortigate_user }
+#                password: { get_input: fortigate_password }
+#                policyId: '2'
+#                policyName: { get_input: policy_name }
+#                srcintf: { get_input: policy_srcinterface }
+#                dstintf: { get_input: policy_dstinterface }
+#                action:  { get_input: policy_action }
+#                serviceName: { get_input: service_name }
 
 
 ## Example how to create service to be used by the policy (the policy node is dependes on this node)
@@ -137,7 +154,7 @@ node_templates:
     interfaces:
       cloudify.interfaces.lifecycle:
         start:
-          implementation: fortigate.plugin.tasks.create_service
+          implementation: scripts/fortigate.py
           inputs:
             username: { get_input: fortigate_user }
             password: { get_input: fortigate_password }
@@ -145,25 +162,33 @@ node_templates:
             protocol: { get_input: service_protocol }
             portrange: { get_input: service_portrange }
 
+            invocation:
+                function: create_service
+
+          executor: central_deployment_agent
+
     relationships:
-      - target: FortigateHost
+      - target: FortinetHost
         type: cloudify.relationships.contained_in
 
 
 ## Example:
 ## This should be use only if you have fix ip's set on some interfaces, ref:  connected_to_port
 
-#  Fortigate.port.config:
+#  fortinet.port.config:
 #    type: cloudify.nodes.SoftwareComponent
 #    interfaces:
 #      cloudify.interfaces.lifecycle:
 #        start:
-#          implementation: cloudify-fortigate-plugin.plugin.tasks.config_ports
+#          implementation: scripts/fortigate.py
 #          inputs:
 #            username: { get_input: fortigate_user }
 #            password: { get_input: fortigate_password }
+#            invocation:
+#                function: config_ports
+#          executor: central_deployment_agent
 #    relationships:
-#      - target: FortigateHost
+#      - target: FortinetHost
 #        type: cloudify.relationships.contained_in
 #      - target: wan_network
 #        type: cloudify.relationships.connected_to

@@ -1,0 +1,4 @@
+plugins:
+  fortigate:
+    executor: central_deployment_agent
+    source: cloudify-fortigate-plugin
